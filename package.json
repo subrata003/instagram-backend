@@ -5,9 +5,25 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start":"nodemon server.js",
+    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subrata003/instagram-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/subrata003/instagram-backend/issues"
+  },
+  "homepage": "https://github.com/subrata003/instagram-backend#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.1.5"
+  }
 }
