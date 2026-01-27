@@ -103,8 +103,8 @@ export const getUser=async (req,res)=>{
 
 export const editProfile=async(req,res)=>{
  try {
-  const userid=req.user._id;
-  if(!userid) return res.status(404).json({success:false,message:"User not found"})
+  const userId=req.userId;
+  if(!userId) return res.status(404).json({success:false,message:"User not found"})
   
  } catch (error) {
   res.status(500).json({ message: error.message });
