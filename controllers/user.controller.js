@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { getDataUri } from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
  try {
@@ -104,10 +106,81 @@ export const getUser=async (req,res)=>{
 export const editProfile=async(req,res)=>{
  try {
   const userId=req.userId;
-  if(!userId) return res.status(404).json({success:false,message:"User not found"})
+  const {bio}=req.body;
+  const profilePic=req.file;
+  let cloudeResponse;
+
+  if(profilePic){
+    const fileUri=getDataUri(profilePic)
+    cloudeResponse=await cloudinary.uploader.upload(fileUri)
+  }
+
+  const user=await User.findById(userId);
+  if(!user) return res.status(404).json({success:false,message:"User not found"})
+    if(bio) user.bio=bio;
+    if(profilePic) user.profilePic=cloudeResponse.secure_url;
+
+    await user.save();
+
+    return res.status(200).json({success:true,message:"Profile updated successfully",user})
+
   
  } catch (error) {
   res.status(500).json({ message: error.message });
   
  }
+}
+export const getSuggestUser=async(req,res)=>{
+ try {
+  const userId=req.userId;
+  const user=await User.findById(userId);
+  if(!user) return res.status(404).json({success:false,message:"User not found"})
+
+  const suggestUser=await User.find({_id:{$ne:req.userId}}).select("-password").limit(5);
+  res.status(200).json({success:true,message:"Suggest user",suggestUser})
+  if(!suggestUser) return res.status(404).json({success:false,message:"do not have any suggest user"})
+    return res.status(200).json({success:true,message:"Suggest user",suggestUser})
+
+ } catch (error) {
+  res.status(500).json({ message: error.message });
+ }
+}
+
+export const followOrUnfollow=async(req,res)=>{
+  try {
+    const userId=req.userId;
+    const followkornewala=userId
+    const jiskofollowkorunga=req.params.id;
+    if(followkornewala === jiskofollowkorunga){
+      return res.status(404).json({success:false,message:"You can not follow yourself"})
+    }
+    const user=await User.findById(userId);
+    const targetUser=await User.findById(jiskofollowkorunga);
+    if(!user || !targetUser) return res.status(404).json({success:false,message:"User not found"})
+   const isFollowed=user.following.includes(jiskofollowkorunga);
+   if(isFollowed){
+
+    await Promise.all([
+      User.updateOne({_id:followkornewala},{$pull:{following:jiskofollowkorunga}}),
+      User.updateOne({_id:jiskofollowkorunga},{$pull:{followers:followkornewala}}),
+    ])
+    return res.status(200).json({success:true,message:"Unfollowed"})
+     
+   }
+   else{
+    //when we can perform two opreationat at a time , than we use promise.all
+    await Promise.all([
+      User.updateOne({_id:followkornewala},{$push:{following:jiskofollowkorunga}}),
+      User.updateOne({_id:jiskofollowkorunga},{$push:{followers:followkornewala}}),
+    ])
+    return res.status(200).json({success:true,message:"Followed"})
+   }
+
+
+
+    
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    
+  }
 }
