@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDb from './config/mongodb.js';
+import route from './routes/users.route.js';
+import cookieParser from 'cookie-parser';
 const app=express();
 
 //middlewares
@@ -16,7 +18,10 @@ app.use(cors(corseOption));
 dotenv.config();
 const PORT=3000;
 
+app.use(cookieParser());
 
+//route
+app.use("/api/v1/user",route)
 
 connectDb();
 app.get('/',(req,res)=>{

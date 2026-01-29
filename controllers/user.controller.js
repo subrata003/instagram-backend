@@ -6,8 +6,8 @@ import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
  try {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
+  const { username, email, password } = req.body;
+  if (!username || !email || !password) {
    return res.status(400).json({ message: "All fields are required" });
   }
   const isUser = await User.findOne({ email });
@@ -17,7 +17,7 @@ export const register = async (req, res) => {
   const hashpw = await bcrypt.hash(password, 10);
 
 
-  const user = new User({ name, email, password: hashpw });
+  const user = new User({ username, email, password: hashpw });
   await user.save();
   return res.status(200).json({ success: true, message: "User registered successfully" });
 
@@ -62,8 +62,8 @@ export const login=async(req,res)=>{
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? 'none' : "strict",
       maxAge: 1000 * 60 * 60
-    }).status(200).json({success:true,message:"Login successful",token});
-   return res.status(200).json({success:true,message:"Login successful",token,user});
+    }).status(200).json({success:true,message:"Login successful",token,user});
+   return res.status(200).json({success:true,message:"Login successful",user});
   } catch (error) {
   res.status(500).json({ message: error.message });
   
