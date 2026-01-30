@@ -115,7 +115,7 @@ export const editProfile=async(req,res)=>{
     cloudeResponse=await cloudinary.uploader.upload(fileUri)
   }
 
-  const user=await User.findById(userId);
+  const user=await User.findById(userId).select('-password');
   if(!user) return res.status(404).json({success:false,message:"User not found"})
     if(bio) user.bio=bio;
     if(profilePic) user.profilePic=cloudeResponse.secure_url;
