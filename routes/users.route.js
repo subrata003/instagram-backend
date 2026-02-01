@@ -10,7 +10,7 @@ route.post("/login",login);
 route.get("/logout",logout)
 route.get("/:id/profile",userAuth,getUser)
 route.post("/editprofile",userAuth,upload.single("image"),editProfile)
-route.get("/suggested",getSuggestUser)
-route.post("/followunfollow/:id",followOrUnfollow)
+route.get("/suggested",userAuth,getSuggestUser)
+route.post("/followunfollow/:id",userAuth,followOrUnfollow)
 
 export default route

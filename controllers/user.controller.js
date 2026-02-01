@@ -12,7 +12,7 @@ export const register = async (req, res) => {
   }
   const isUser = await User.findOne({ email });
   if (isUser) {
-   res.status(400).json({ success: false, message: "User already exists" });
+   return res.status(400).json({ success: false, message: "User already exists" });
   }
   const hashpw = await bcrypt.hash(password, 10);
 
@@ -130,21 +130,46 @@ export const editProfile=async(req,res)=>{
   
  }
 }
-export const getSuggestUser=async(req,res)=>{
- try {
-  const userId=req.userId;
-  const user=await User.findById(userId);
-  if(!user) return res.status(404).json({success:false,message:"User not found"})
+export const getSuggestUser = async (req, res) => {
+  try {
+     const userId=req.userId;
+    console.log("login usr id is ",userId);
+    
 
-  const suggestUser=await User.find({_id:{$ne:req.userId}}).select("-password").limit(5);
-  res.status(200).json({success:true,message:"Suggest user",suggestUser})
-  if(!suggestUser) return res.status(404).json({success:false,message:"do not have any suggest user"})
-    return res.status(200).json({success:true,message:"Suggest user",suggestUser})
+    const user = await User.findById(userId);
+    console.log("backend user is ",user);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
 
- } catch (error) {
-  res.status(500).json({ message: error.message });
- }
-}
+    const suggestUser = await User.find({
+      _id: { $ne: userId }
+    })
+      .select("-password")
+      .limit(5);
+
+    if (suggestUser.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No suggested users found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Suggested users",
+      suggestUser
+    });
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 
 export const followOrUnfollow=async(req,res)=>{
   try {
